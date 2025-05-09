@@ -8,9 +8,12 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <stdexcept>
 #include <unistd.h>
 #include <cstring>
+
+#include <stdexcept>
+#include "exceptions/ConnectionRefusedException.h"
+#include "exceptions/ConnectionFailedException.h"
 
 #define BUFFER_SIZE 1048576  // 1 MiB
 
@@ -24,6 +27,7 @@ private:
 
 public:
     explicit Server(int port_num);
+    Server* getInstance();
     void run();
     ~Server();
 };
