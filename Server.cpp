@@ -31,7 +31,7 @@ Server::Server(const int port_num): port_num(port_num) {
 }
 
 void Server::run() {
-    // initializing a request queue of size 10
+    // initializing a request queue of size 100
     int listen_val = listen(server_fd, 100);
     // when the queue is full -> refuse connection
     if (listen_val == -1) {
