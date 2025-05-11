@@ -6,10 +6,10 @@
 
 #include <utility>
 
-HttpRequest::HttpRequest(std::string method, URL url, std::string http_version,
+HttpRequest::HttpRequest(std::string method, std::string path, std::string http_version,
         const std::map<std::string, std::string> &headers, std::string body)
         : method(std::move(method)),
-          url(std::move(url)),
+          path(path),
           http_version(std::move(http_version)),
           headers(headers),
           body(std::move(body)) {
@@ -23,12 +23,12 @@ void HttpRequest::set_method(const std::string &method) {
     this->method = method;
 }
 
-URL HttpRequest::get_url() const {
-    return url;
+std::string HttpRequest::get_path() const {
+    return path;
 }
 
-void HttpRequest::set_url(const URL &url) {
-    this->url = url;
+void HttpRequest::set_path(const std::string &path) {
+    this->path = path;
 }
 
 std::string HttpRequest::get_http_version() const {
@@ -45,4 +45,24 @@ std::map<std::string, std::string> HttpRequest::get_headers() const {
 
 void HttpRequest::set_headers(const std::map<std::string, std::string> &headers) {
     this->headers = headers;
+}
+
+std::string HttpRequest::get_body() const {
+    return body;
+}
+void HttpRequest::set_body(const std::string &body) {
+    this->body = body;
+}
+
+std::string HttpRequest::to_string() const {
+    std::string output;
+    output += "method: " + method + "\n";
+    output += "http_version: " + http_version + "\n";
+    output += "path: " + path + "\n";
+    output += "headers:\n";
+    for (const auto& [key, value] : headers) {
+        output += "  " + key + ": " + value + "\n";
+    }
+    output += "body: " + body + "\n";
+    return output;
 }

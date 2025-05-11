@@ -14,21 +14,22 @@
 #include <stdexcept>
 #include "exceptions/ConnectionRefusedException.h"
 #include "exceptions/ConnectionFailedException.h"
+#include "http/RequestParser.h"
 
 #define BUFFER_SIZE 1048576  // 1 MiB
 
 class Server {
 private:
     int port_num;
-    int server_fd;
+    int server_socket;
     struct sockaddr_in address{}; // internet socket structure
     socklen_t address_size;
     char* recv_buffer;
 
 public:
     explicit Server(int port_num);
-    Server* getInstance();
-    void run();
+    // Server* getInstance();
+    void run() const;
     ~Server();
 };
 

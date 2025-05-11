@@ -15,24 +15,25 @@ Server::Server(const int port_num): port_num(port_num) {
     recv_buffer = new char[BUFFER_SIZE];    // initialize a buffer of size 1 MiB
 
     // create a TCP socket with IPv4
-    server_fd = socket(AF_INET, SOCK_STREAM, 0); // returns -1 for errors
-    if(server_fd == -1) {
+    server_socket = socket(AF_INET, SOCK_STREAM, 0); // returns -1 for errors
+    if(server_socket == -1) {
         throw std::runtime_error("Failed to create the socket.");
     }
 
-    // Attach socket to the port (for easy restarts)
+    // attach socket to the port (for easy restarts)
     int opt = 1;
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     // bind the IP address and port to the socket
-    if(bind(server_fd, reinterpret_cast<sockaddr*>(&address), address_size) == -1) {
+    if(bind(server_socket, reinterpret_cast<sockaddr*>(&address), address_size) == -1) {
         throw std::runtime_error("Failed to bind the IP address and the port to the socket.");
     }
+
 }
 
-void Server::run() {
+void Server::run() const {
     // initializing a request queue of size 100
-    int listen_val = listen(server_fd, 100);
+    int listen_val = listen(server_socket, 100);
     // when the queue is full -> refuse connection
     if (listen_val == -1) {
         throw ConnectionRefusedException("Request Queue is Full.");
@@ -42,21 +43,43 @@ void Server::run() {
         sockaddr_in client_address{};
         socklen_t client_address_size = sizeof(client_address);
         // get the first request from the pending queue
-        int client_fd = accept(server_fd, reinterpret_cast<sockaddr*>(&client_address), &client_address_size);
-        if (client_fd == -1) {
+        int client_socket = accept(server_socket, reinterpret_cast<sockaddr*>(&client_address), &client_address_size);
+        if (client_socket == -1) {
             throw ConnectionRefusedException("Client failed to connect to server.");
         }
         std::cout << "New client connected successfully.\n";
-        long n_bytes = recv(client_fd, &recv_buffer, BUFFER_SIZE, 0);
+        // std::string request;
+        memset(recv_buffer, 0, BUFFER_SIZE);
+        long n_bytes = recv(client_socket, recv_buffer, BUFFER_SIZE, 0);
         if (n_bytes > 0) {
             std::cout << "Number of received bytes: " << n_bytes << std::endl;
-            std::cout << "Message from client: " << recv_buffer;
+            // request = std::string(recv_buffer, n_bytes);
         }
+
+        // for (int i = 0; i < n_bytes; ++i) {
+        //     unsigned char c = recv_buffer[i];
+        //     if (std::isprint(c))
+        //         std::cout << c;
+        //     else if (c == '\0')
+        //         std::cout << "\\0";
+        //     else if (c == '\r')
+        //         std::cout << "\\r";
+        //     else if (c == '\n')
+        //         std::cout << "\\n\n";
+        //     else
+        //         std::cout << "\\x" << std::hex << static_cast<int>(c);
+        // }
+        // std::cout << std::endl;
+
+        HttpRequest request = RequestParser::parse(recv_buffer, n_bytes);
+        std::cout << request.to_string();
+
         std::cout << "Client disconnected successfully.\n";
-        close(client_fd);
+        close(client_socket);
     }
 }
 
 Server::~Server() {
-    close(server_fd);
+    delete[] recv_buffer;
+    close(server_socket);
 }
