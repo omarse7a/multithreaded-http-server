@@ -13,6 +13,4 @@ public:
     static HttpRequest parse(const char* request, long n);
 };
 
-
-
 #endif //REQUESTPARSER_H

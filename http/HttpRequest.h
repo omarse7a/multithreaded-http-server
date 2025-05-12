@@ -10,28 +10,13 @@
 #include <map>
 #include "../utils.h"
 
-// struct URL {
-//     std::string protocol;
-//     std::string host;
-//     std::string file_path;
-//     explicit URL(const std::string& url) {
-//         // split the protocol from the rest of the URL
-//         std::vector<std::string> protocol_path = utils::split(url, ':');
-//         protocol = protocol_path[0];
-//         // split the host name (or address) from the requested file path
-//         std::vector<std::string> host_file = utils::split(protocol_path[1], '/', 1, 2);
-//         host = host_file[0];
-//         file_path = host_file[1];
-//     }
-// };
-
 class HttpRequest {
 private:
     std::string method;
     std::string path;
     std::string http_version;
     std::map<std::string, std::string> headers;
-    std::string body;
+    std::string body{};
 
 public:
 HttpRequest(std::string method, std::string path, std::string http_version,

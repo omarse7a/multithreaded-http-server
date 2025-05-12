@@ -56,13 +56,13 @@ void HttpRequest::set_body(const std::string &body) {
 
 std::string HttpRequest::to_string() const {
     std::string output;
-    output += "method: " + method + "\n";
-    output += "http_version: " + http_version + "\n";
-    output += "path: " + path + "\n";
-    output += "headers:\n";
+    output += "Method: " + method + "\n";
+    output += "HTTP Version: " + http_version + "\n";
+    output += "Path: " + path + "\n";
+    output += "Headers:\n";
     for (const auto& [key, value] : headers) {
         output += "  " + key + ": " + value + "\n";
     }
-    output += "body: " + body + "\n";
+    output += "Body: " + body + "\n";
     return output;
 }

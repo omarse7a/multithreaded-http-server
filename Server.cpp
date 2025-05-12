@@ -53,26 +53,18 @@ void Server::run() const {
         long n_bytes = recv(client_socket, recv_buffer, BUFFER_SIZE, 0);
         if (n_bytes > 0) {
             std::cout << "Number of received bytes: " << n_bytes << std::endl;
-            // request = std::string(recv_buffer, n_bytes);
         }
-
-        // for (int i = 0; i < n_bytes; ++i) {
-        //     unsigned char c = recv_buffer[i];
-        //     if (std::isprint(c))
-        //         std::cout << c;
-        //     else if (c == '\0')
-        //         std::cout << "\\0";
-        //     else if (c == '\r')
-        //         std::cout << "\\r";
-        //     else if (c == '\n')
-        //         std::cout << "\\n\n";
-        //     else
-        //         std::cout << "\\x" << std::hex << static_cast<int>(c);
-        // }
-        // std::cout << std::endl;
 
         HttpRequest request = RequestParser::parse(recv_buffer, n_bytes);
         std::cout << request.to_string();
+
+        std::string response =
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain\r\n"
+            "Content-Length: 12\r\n"
+            "\r\n"
+            "Hello World!";
+        send(client_socket, response.c_str(), response.size(), 0);
 
         std::cout << "Client disconnected successfully.\n";
         close(client_socket);
